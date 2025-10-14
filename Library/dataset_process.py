@@ -1,6 +1,6 @@
 
 from datasets import load_dataset
-# from model_manager import ModelManager
+import json
 print("Libraries loaded!")
 
 class AdapterProvider():
@@ -18,6 +18,10 @@ class AdapterProvider():
             self.preprocess = math_dial_preprocess_v3
             self.split = "train"
 
+        elif dataset_name == "mathvision":
+
+            self.split = "test"
+            self.preprocess = math_vision_preprocess
 
     def get_get_inputs(self):
         return self.get_get_inputs 
@@ -75,6 +79,86 @@ def math_vista_preprocess(example, processor):
         # print("Labels: ", model_inputs["labels"])
 
         return model_inputs 
+
+
+with open("./MetaData/mathvision_v2.json") as f:
+    conv_list= json.load(f)
+
+def math_vision_preprocess(example, processor):
+    end_token_id = processor.tokenizer.encode("<|end|>")[1]
+    assistant_token_id = processor.tokenizer.encode("<|assistant|>")[1]
+    image = example["decoded_image"]
+
+    ex_id = int(example['id'])
+
+    try:
+        convs = conv_list[ex_id]["messages"]
+    except KeyError as e:
+        return {
+            "input_ids": [],
+            "attention_mask": [],
+            "pixel_values": [],  # If this is a list of tensors, ensure the placeholder matches the expected type
+            "image_sizes": [],   # Add any other keys your successful examples return
+            "labels": [],
+            "drop": True # Flag to be filtered out 
+        }
+
+    context_text = f"""
+    Here is the context for this problem: 
+    Question:
+    {example['question']}
+
+    Question image:
+
+    <|image_1|>\n
+
+    Correct answer:
+    {example['answer']}
+    
+    Teacher student conversation:
+    """
+
+    messages = [{"role": "user", "content": context_text}]
+
+    for item in convs:
+        if "teacher" in item:
+            messages.append({"role": "assistant", "content": item["teacher"]})
+
+        elif "student" in item:
+            messages.append({"role": "user", "content": item["student"]})
+
+    full_prompt = processor.tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=False
+    )
+
+    model_inputs = processor(
+        text=full_prompt,
+        images=image
+    )
+
+    input_ids = model_inputs["input_ids"]
+    input_ids[input_ids == -1] = processor.tokenizer.pad_token_id
+    model_inputs["input_ids"] = input_ids[0].tolist()
+    model_inputs["labels"] = input_ids[0].tolist()
+    model_inputs["attention_mask"] = model_inputs["attention_mask"][0]
+
+    model_inputs["image_grid_thw"] = model_inputs.get("image_grid_thw", [(1, 14, 14)])
+
+    turn_to_neg = True
+    for idx, val in enumerate(model_inputs["labels"]):
+      if val == assistant_token_id:
+        turn_to_neg = False
+      elif val == end_token_id:
+        turn_to_neg = True
+        continue
+
+      if turn_to_neg:
+        model_inputs["labels"][idx] = -100
+    model_inputs["drop"] = False
+    return model_inputs
+
 
 def math_dial_preprocess(example, processor):
     conv = example["conversation"]
@@ -168,10 +252,8 @@ def math_dial_preprocess_v2(example, processor):
         model_inputs["labels"][idx] = -100
     return model_inputs
 
-
 def math_dial_preprocess_v3(example, processor):
 
-    user_token_id = processor.tokenizer.encode("<|user|>")[1]
     end_token_id = processor.tokenizer.encode("<|end|>")[1]
     assistant_token_id = processor.tokenizer.encode("<|assistant|>")[1]
 
@@ -245,6 +327,8 @@ def math_dial_preprocess_v3(example, processor):
 
       if turn_to_neg:
         model_inputs["labels"][idx] = -100
+    
+    print(model_inputs.keys())
     return model_inputs
 
 

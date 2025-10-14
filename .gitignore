@@ -19,8 +19,9 @@ __pycache__/
 env/
 venv/
 ENV/
-VLA_env
+*_env
 Models/
+MathLLMs/
 
 # ========================
 # IDEs & Editors
