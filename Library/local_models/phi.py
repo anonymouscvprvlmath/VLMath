@@ -2,8 +2,6 @@ from typing import Optional, Tuple
 from Library.local_models.local_model import LocalModel
 from transformers import AutoModelForCausalLM, AutoProcessor, BitsAndBytesConfig
 import torch
-from datasets import load_dataset, load_from_disk
-import json
 
 
 class Phi(LocalModel):
@@ -79,39 +77,6 @@ class Phi(LocalModel):
         self.prepared_for_inference = True
         self.print_model_quantization_info(model=self.model)
 
-    # def process_dataset(self, dataset_name: str, preprocess: bool, args):
-
-    #     self.subcategory = "scaffolding"
-    #     if preprocess:
-    #         dataset = load_dataset(dataset_name, split=args.dataset_split)
-    #         with open(f"./MetaData/mathvision_{self.subcategory}.json") as f:
-    #             self.conv_dict = json.load(f)
-
-    #         original_column_names = dataset.column_names
-    #         processed_dataset = dataset.map(
-    #             self.process_math_vision, writer_batch_size=50
-    #         )
-    #         print("Selecting the non drop ones")
-    #         indicies_to_keep = [
-    #             i for i, flag in enumerate(processed_dataset["drop"]) if not flag
-    #         ]
-    #         processed_dataset = processed_dataset.select(indicies_to_keep)
-    #         print("Dataset prorcessed...")
-    #         processed_dataset = processed_dataset.remove_columns(
-    #             original_column_names + ["drop"]
-    #         )
-
-    #         print("Saving the processed dataset to disk")
-    #         processed_dataset.save_to_disk(
-    #             dataset_name + f"_processed_with_{self.base_model}_{self.subcategory}"
-    #         )
-    #         return processed_dataset
-
-    #     else:
-    #         return load_from_disk(
-    #             dataset_name + f"_processed_with_{self.base_model}_{self.subcategory}"
-    #         )
-
     def run_inference(
         self,
         prompt: str = "",
@@ -154,12 +119,9 @@ class Phi(LocalModel):
         return response
 
     def process_math_vision(self, example):
-        end_token_id = self.tokenizer.encode("<|end|>")[1]
-        assistant_token_id = self.tokenizer.encode("<|assistant|>")[1]
         image = example["decoded_image"]
 
         ex_id = example["id"]
-        # print(self.conv_dict[ex_id])
         try:
             convs = self.conv_dict[ex_id][f"{self.subcategory}_conv"]
         except KeyError as e:
@@ -209,17 +171,6 @@ class Phi(LocalModel):
         model_inputs["labels"] = input_ids[0].tolist()
         model_inputs["attention_mask"] = model_inputs["attention_mask"][0]
 
-        # Turning everything
-        # turn_to_neg = True
-        # for idx, val in enumerate(model_inputs["labels"]):
-        #     if val == assistant_token_id:
-        #         turn_to_neg = False
-        #     elif val == end_token_id:
-        #         turn_to_neg = True
-        #         continue
-
-        #     if turn_to_neg:
-        #         model_inputs["labels"][idx] = -100
         model_inputs["drop"] = False
 
         return model_inputs
@@ -262,6 +213,4 @@ class Phi(LocalModel):
         output = output[:, inputs["input_ids"].shape[1] :]
         clean_ids = output.masked_fill(output == -1, self.tokenizer.eos_token_id)
         response = self.tokenizer.decode(clean_ids[0], skip_special_tokens=True)
-        # print(len(clean_ids[0]))
-        # print(clean_ids)
         return response, len(clean_ids[0])

@@ -7,8 +7,6 @@ from transformers import (
     AutoTokenizer,
 )
 import torch
-import json
-from datasets import load_dataset, load_from_disk
 import copy
 
 
@@ -45,9 +43,6 @@ class Qwen(LocalModel):
     def init_special_tokens(self):
         self.model.config.eos_token_id = self.tokenizer.eos_token_id
         self.model.config.pad_token_id = self.tokenizer.pad_token_id
-        # print(self.tokenizer.special_tokens_map)
-        # self.end_token_id = self.tokenizer.encode("<|end|>", add_special_tokens=False)
-        # self.assistant_token_id = self.tokenizer.encode("<|assistant|>", add_special_tokens=False)
 
     def _prepare_for_inference(self):
         if not torch.cuda.is_available():
@@ -105,37 +100,6 @@ class Qwen(LocalModel):
         )
         return response
 
-    # def process_dataset(self, dataset_name: str, preprocess: bool, args):
-
-    #     if preprocess:
-    #         dataset = load_dataset(dataset_name, split=args.dataset_split)
-    #         with open("./MetaData/mathvision_v2.json") as f:
-    #             self.conv_list = json.load(f)
-
-    #         original_column_names = dataset.column_names
-    #         processed_dataset = dataset.map(
-    #             self.process_math_vision, writer_batch_size=50
-    #         )
-    #         # print(processed_dataset[0])
-    #         print("Selecting the non drop ones")
-    #         indicies_to_keep = [
-    #             i for i, flag in enumerate(processed_dataset["drop"]) if not flag
-    #         ]
-    #         processed_dataset = processed_dataset.select(indicies_to_keep)
-    #         print("Dataset prorcessed...")
-    #         processed_dataset = processed_dataset.remove_columns(
-    #             original_column_names + ["drop"]
-    #         )
-
-    #         print("Saving the processed dataset to disk")
-    #         processed_dataset.save_to_disk(
-    #             dataset_name + f"_processed_with_{self.base_model}"
-    #         )
-    #         return processed_dataset
-
-    #     else:
-    #         return load_from_disk(dataset_name + f"_processed_with_{self.base_model}")
-
     def process_math_vision(self, example):
         image = example["decoded_image"]
         ex_id = example["id"]
@@ -152,31 +116,6 @@ class Qwen(LocalModel):
                 "drop": True,  # Flag to be filtered out
             }
 
-        # context = f"""
-        # Here is the context for this problem:
-        # Question:
-        # {example['question']}
-
-        # Question image:
-
-        # <|image_1|>\n
-
-        # Correct answer:
-        # {example['answer']}
-
-        # Teacher student conversation:
-        # """
-
-        # messages = [
-        #     {
-        #         # "role": "system",
-        #         "role": "user",
-        #         "content": [
-        #             {"type": "text", "text": context},
-        #             {"type": "image", "image": image},
-        #         ],
-        #     }
-        # ]
         messages = [
             {
                 "role": "system",
@@ -272,107 +211,7 @@ class Qwen(LocalModel):
         self.debug_print_trainable_text(inputs)
         return inputs
 
-    # def process_math_vision(self, example):
-    #     image = example["decoded_image"]
-    #     ex_id = example["id"]
-    #     try:
-    #         # conversations = self.conv_dict[ex_id]["messages"]
-    #         conversations = self.conv_dict[ex_id][f"{self.subcategory}_conv"]
-    #     except KeyError as e:
-    #         return {
-    #             "input_ids": [],
-    #             "attention_mask": [],
-    #             "pixel_values": [],
-    #             "image_grid_thw": [],
-    #             "labels": [],
-    #             "drop": True,  # Flag to be filtered out
-    #         }
-
-    #     # context = f"""
-    #     # Here is the context for this problem:
-    #     # Question:
-    #     # {example['question']}
-
-    #     # Correct answer:
-    #     # {example['answer']}
-
-    #     # Teacher student conversation:
-    #     # """
-
-    #     # messages = [
-    #     #     {
-    #     #         "role": "system",
-    #     #         # "role": "user",
-    #     #         "content": [
-    #     #             {"type": "text", "text": context},
-    #     #             {"type": "image", "image": image},
-    #     #         ],
-    #     #     }
-    #     # ]
-
-    #     messages = [
-    #         {
-    #             "role": "system",
-    #             "content": [
-    #                 {
-    #                     "type": "text",
-    #                     "text": "You are a patient math teacher who helps the student reason step by step.",
-    #                 }
-    #             ],
-    #         },
-    #         {
-    #             "role": "user",
-    #             "content": [
-    #                 {"type": "text", "text": f"Question:\n{example['question']}"},
-    #                 {"type": "image", "image": example["decoded_image"]},
-    #                 {
-    #                     "type": "text",
-    #                     "text": f"\nCorrect answer: {example['answer']}\nLet's begin the discussion.",
-    #                 },
-    #             ],
-    #         },
-    #     ]
-
-    #     for item in conversations:
-    #         if "teacher" in item:
-    #             # print(item["teacher"])
-    #             messages.append(
-    #                 {
-    #                     "role": "assistant",
-    #                     "content": [{"type": "text", "text": item["teacher"]}],
-    #                 }
-    #             )
-
-    #         elif "student" in item:
-    #             messages.append(
-    #                 {
-    #                     "role": "user",
-    #                     "content": [{"type": "text", "text": item["student"]}],
-    #                 }
-    #             )
-
-    #     inputs = self.processor.apply_chat_template(
-    #         messages,
-    #         tokenize=True,
-    #         return_dict=True,
-    #         return_tensors="pt",
-    #         return_assistant_tokens_mask=True,
-    #     )
-
-    #     # print(inputs.keys())
-
-    #     inputs["input_ids"] = inputs["input_ids"].flatten()
-    #     # input_ids = inputs["input_ids"]
-    #     # inputs["labels"] = copy.deepcopy(input_ids)
-    #     labels = inputs["input_ids"].clone()
-    #     labels[~inputs["assistant_masks"].flatten()] = -100
-    #     inputs["attention_mask"] = inputs["attention_mask"].flatten()
-    #     inputs["image_grid_thw"] = inputs["image_grid_thw"].flatten()
-    #     inputs["labels"] = labels
-    #     inputs["drop"] = False
-    #     # labels = inputs["labels"]
-    #     # self.debug_print_conversation_tokens(inputs)
-
+    # VIBE
     def debug_print_trainable_text(self, inputs):
         """
         Prints only the text segments that are *trainable* (labels != -100).
@@ -485,26 +324,3 @@ class Qwen(LocalModel):
                 f"Trainable tokens: {num_trainable}/{len(labels)} "
                 f"({num_trainable/len(labels)*100:.2f}%)"
             )
-
-
-# VIBE CODE
-def debug_print_inputs(inputs):
-    print("\n=== Debug: process_math_vision return structure ===")
-    for k, v in inputs.items():
-        # Detect type and shape info
-        if hasattr(v, "shape"):
-            print(f"{k:20s} | type: {type(v)} | shape: {tuple(v.shape)}")
-        elif isinstance(v, (list, tuple)):
-            if len(v) > 0 and hasattr(v[0], "shape"):
-                print(
-                    f"{k:20s} | type: list[{type(v[0])}] | first shape: {tuple(v[0].shape)} | len: {len(v)}"
-                )
-            elif len(v) > 0 and isinstance(v[0], (list, tuple)):
-                print(
-                    f"{k:20s} | type: nested list | first lens: {[len(x) for x in v[:3]]} ... | len: {len(v)}"
-                )
-            else:
-                print(f"{k:20s} | type: list | len: {len(v)} | sample: {str(v[:3])}")
-        else:
-            print(f"{k:20s} | type: {type(v)} | value: {str(v)[:80]}")
-    print("====================================================\n")

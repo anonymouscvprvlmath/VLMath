@@ -60,10 +60,6 @@ class ModelManager:
         print(f"Trainable params: {trainable:,}")
         print(f"Frozen params:   {frozen:,}")
 
-    # images is a list of image, prompt is str
-    # def run_inference(self, prompt = "", images = [], messages = []):
-    #     return self.local_model.run_inference(prompt=prompt, images=images, messages=messages)
-
     def run_inference(self, *args, **kwargs):
         return self.local_model.run_inference(*args, **kwargs)
 
@@ -87,7 +83,7 @@ class ModelManager:
             dataset_name=dataset_name, preprocess=preprocess, args=args
         )
 
-        # self.local_model.tokenizer.padding_side = "left"
+        self.local_model.tokenizer.padding_side = "left"
         data_collator = DataCollatorForSeq2Seq(
             tokenizer=self.local_model.tokenizer,
             model=self.local_model.model,
