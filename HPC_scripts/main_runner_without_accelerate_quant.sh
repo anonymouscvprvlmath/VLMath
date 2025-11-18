@@ -1,7 +1,7 @@
 #!/bin/sh
 #SBATCH --job-name=VLMFinetune
 #SBATCH -N 1    ## requests on 1 node
-#SBATCH --gres=gpu:1   # request 2 GPUs
+#SBATCH --gres=gpu:1
 #SBATCH --time=12:00:00
 #SBATCH --output /work/%u/VLA_results/job%j.out
 #SBATCH --error /work/%u/VLA_results/job%j.err
@@ -16,8 +16,8 @@ module load python3/anaconda/3.12
 
 
 # Activate your conda environment, ## user source activate on cluster, not conda activate
-source activate /work/$user/VLA/VLA_env
+source activate /work/$user/VLA/phi_quant_env
 
 # Add this line to pass all the arguments down to main.py
-accelerate launch /work/$user/VLA/main.py "$@"
+python /work/$user/VLA/main.py "$@"
 

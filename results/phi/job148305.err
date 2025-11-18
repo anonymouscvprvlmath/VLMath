@@ -1,0 +1,54 @@
+You are attempting to use Flash Attention 2.0 with a model not initialized on GPU. Make sure to move the model to GPU after initializing it on CPU with `model.to('cuda')`.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:03<00:03,  3.34s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:04<00:00,  1.93s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:04<00:00,  2.14s/it]
+/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/transformers/models/auto/image_processing_auto.py:513: FutureWarning: The image_processor_class argument is deprecated and will be removed in v4.42. Please use `slow_image_processor_class`, or `fast_image_processor_class` instead
+  warnings.warn(
+/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/accelerate/utils/dataclasses.py:832: UserWarning: DeepSpeed Zero3 Init flag is only applicable for ZeRO Stage 3. Setting it to False.
+  warnings.warn("DeepSpeed Zero3 Init flag is only applicable for ZeRO Stage 3. Setting it to False.")
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/work/aeslami/VLA/main.py", line 101, in <module>
+[rank0]:     manager.fine_tune(
+[rank0]:   File "/work/aeslami/VLA/Library/model_manager.py", line 101, in fine_tune
+[rank0]:     trainer.train()
+[rank0]:   File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/transformers/trainer.py", line 1938, in train
+[rank0]:     return inner_training_loop(
+[rank0]:   File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/transformers/trainer.py", line 2036, in _inner_training_loop
+[rank0]:     self.optimizer, self.lr_scheduler = deepspeed_init(self, num_training_steps=max_steps)
+[rank0]:   File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/transformers/integrations/deepspeed.py", line 393, in deepspeed_init
+[rank0]:     hf_deepspeed_config.trainer_config_finalize(args, model, num_training_steps)
+[rank0]:   File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/transformers/integrations/deepspeed.py", line 265, in trainer_config_finalize
+[rank0]:     raise ValueError(
+[rank0]: ValueError: Please correct the following DeepSpeed config values that mismatch TrainingArguments values:
+[rank0]: - ds gradient_accumulation_steps=1 vs hf gradient_accumulation_steps=8
+[rank0]: The easiest method is to set these DeepSpeed config values to 'auto'.
+E1023 16:48:31.440690 140737352876864 torch/distributed/elastic/multiprocessing/api.py:826] failed (exitcode: 1) local_rank: 0 (pid: 1189795) of binary: /work/aeslami/VLA/phi_env/bin/python3.10
+Traceback (most recent call last):
+  File "/work/aeslami/VLA/phi_env/bin/accelerate", line 7, in <module>
+    sys.exit(main())
+  File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/accelerate/commands/accelerate_cli.py", line 46, in main
+    args.func(args)
+  File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/accelerate/commands/launch.py", line 1067, in launch_command
+    deepspeed_launcher(args)
+  File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/accelerate/commands/launch.py", line 771, in deepspeed_launcher
+    distrib_run.run(args)
+  File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/torch/distributed/run.py", line 870, in run
+    elastic_launch(
+  File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/work/aeslami/VLA/phi_env/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/work/aeslami/VLA/main.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-10-23_16:48:31
+  host      : node040.cm.cluster
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 1189795)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
