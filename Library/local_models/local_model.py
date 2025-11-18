@@ -46,7 +46,7 @@ class LocalModel(ABC):
         self.subcategory = "scaffolding"
         if preprocess:
             dataset = load_dataset(dataset_name, split=args.dataset_split)
-            with open(f"./MetaData/mathvision_{self.subcategory}.json") as f:
+            with open(f"./Datasets/mathvision_{self.subcategory}.json") as f:
                 self.conv_dict = json.load(f)
 
             original_column_names = dataset.column_names
