@@ -1,9 +1,0 @@
-Warning: The cache directory for DeepSpeed Triton autotune, /home/aeslami/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
-Libraries Loaded
-CUDA Available:  True
-CUDA Device count:  1
-World size: 1
-Rank: 0
-Local rank: 0
-GPU 0:  NVIDIA H200 NVL
-Libraries loaded!

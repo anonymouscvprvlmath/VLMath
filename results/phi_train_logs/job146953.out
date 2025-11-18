@@ -1,4 +1,4 @@
-Warning: The cache directory for DeepSpeed Triton autotune, /home/aeslami/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
+Warning: The cache directory for DeepSpeed Triton autotune, /home/****/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
 Libraries Loaded
 CUDA Available:  True
 CUDA Device count:  1
@@ -10,7 +10,7 @@ Libraries loaded!
 Preparing the training!
 Model name:  microsoft/Phi-3.5-vision-instruct
 Number of Epochs:  2
-Warning: The cache directory for DeepSpeed Triton autotune, /home/aeslami/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
+Warning: The cache directory for DeepSpeed Triton autotune, /home/****/.triton/autotune, appears to be on an NFS system. While this is generally acceptable, if you experience slowdowns or hanging when DeepSpeed exits, it is recommended to set the TRITON_CACHE_DIR environment variable to a non-NFS path.
 {'loss': 0.6254, 'grad_norm': 114681.374808641, 'learning_rate': 4.000000000000001e-06, 'epoch': 0.01}
 {'loss': 0.151, 'grad_norm': 62341.80055147589, 'learning_rate': 8.000000000000001e-06, 'epoch': 0.01}
 {'loss': 0.1342, 'grad_norm': 74340.00161420499, 'learning_rate': 9.983311081441923e-06, 'epoch': 0.02}

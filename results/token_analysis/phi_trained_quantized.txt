@@ -1,4 +1,4 @@
-Loading model from:  /work/aeslami/VLA/Models/base_warmup0_epoch2_batch8_lr1e-5/checkpoint-76
+Loading model from:  /work/****/VLA/Models/base_warmup0_epoch2_batch8_lr1e-5/checkpoint-76
 AI4Math/MathVista
 Using cuda
 

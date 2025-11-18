@@ -20,9 +20,17 @@ env/
 venv/
 ENV/
 *_env
-Models/
+
 MathLLMs/
-!Models/base_warmup0_epoch2_batch8_lr1e-5/
+
+# Ignore all models by default
+Models/*
+
+# !Models/
+# !Models/base_warmup0_epoch2_batch8_lr1e-5/
+# !Models/base_warmup0_epoch2_batch8_lr1e-5/**
+
+
 # ========================
 # IDEs & Editors
 # ========================
