@@ -168,14 +168,14 @@ class ModelManager:
         print(f"{label} Quantization Summary")
         print(f"{'='*100}")
 
-        # 1️⃣ Config summary
+        # Config summary
         quant_cfg = getattr(model.config, "quantization_config", None)
         if quant_cfg:
             print(f"Quantization config detected: {quant_cfg}")
         else:
             print("No quantization config detected (likely full precision).")
 
-        # 2️⃣ Global stats
+        # Global stats
         num_linear4bit = sum("Linear4bit" in str(type(m)) for m in model.modules())
         num_linear8bit = sum("Linear8bitLt" in str(type(m)) for m in model.modules())
         num_linear = sum("Linear" in str(type(m)) for m in model.modules())
@@ -184,7 +184,7 @@ class ModelManager:
         print(f" → 4-bit quantized layers: {num_linear4bit}")
         print(f" → 8-bit quantized layers: {num_linear8bit}")
 
-        # 3️⃣ Section-wise quantization breakdown
+        # Section-wise quantization breakdown
         print("\nSection-wise Quantization Overview:")
         key_parts = [
             "vision",
@@ -220,7 +220,7 @@ class ModelManager:
                     f"4-bit: {stats['4bit']:<3} | 8-bit: {stats['8bit']:<3} | Mode: {q_type}"
                 )
 
-        # 4️⃣ Global dtype & device
+        # Global dtype & device
         try:
             sample_param = next(model.parameters())
             print(f"\nModel dtype:  {sample_param.dtype}")
@@ -228,7 +228,7 @@ class ModelManager:
         except StopIteration:
             print("No parameters found.")
 
-        # 5️⃣ GPU memory snapshot
+        # GPU memory snapshot
         if torch.cuda.is_available():
             mem_alloc = torch.cuda.memory_allocated() / 1e9
             mem_reserved = torch.cuda.memory_reserved() / 1e9
