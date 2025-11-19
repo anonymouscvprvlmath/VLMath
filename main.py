@@ -1,9 +1,6 @@
 from Library.model_manager import ModelManager
-from Library.dataset_process import AdapterProvider
 from Library.prompts import context_maker
 import argparse
-import random
-import time
 import numpy as np
 import sys
 
@@ -33,26 +30,23 @@ if __name__ == "__main__":
     # This is to make datasetnames easier to pass as arguments
     dataset_dict = {
         "mathvista": "AI4Math/MathVista",
-        "mathdial": "eth-nlped/mathdial",
         "mathvision": "MathLLMs/MathVision",
     }
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "mode", choices=["train", "benchmark", "inference", "token-count"]
-    )
+    parser.add_argument("mode", choices=["train", "inference", "token-count"])
     parser.add_argument(
         "--train-dataset",
         type=str,
         default="mathvision",
-        help="Supported datasets are: mathvista, mathdial",
+        help="Supported datasets are: mathvista",
     )
-    parser.add_argument(
-        "--benchmark-dataset",
-        type=str,
-        default="mathvista",
-        help="Supported datasets are: mathvista, mathdial",
-    )
+    # parser.add_argument(
+    #     "--benchmark-dataset",
+    #     type=str,
+    #     default="mathvista",
+    #     help="Supported datasets are: mathvista, mathdial",
+    # )
     parser.add_argument(
         "--from-finetuned",
         type=str,
@@ -75,12 +69,18 @@ if __name__ == "__main__":
         "--process-dataset",
         default=False,
         type=bool,
-        help="If you need to process the dataset or if it's ready for training",
+        help="If you need to process the dataset or if it's ready for training. Has to be True to first time you run the code.",
     )
     parser.add_argument("--quantize-4bit", default=False, type=bool)
     parser.add_argument("--quantize-8bit", default=False, type=bool)
     parser.add_argument("--epoch-num", type=int, default=2)
     parser.add_argument("--dataset-split", type=str, default="testmini")
+    parser.add_argument(
+        "--dataset-variation",
+        type=str,
+        default="scaffolding",
+        choices=["scaffolding", "socratic", "mistake_correction"],
+    )
     parser.add_argument("--model-name", type=str, default="phi")
     parser.add_argument("--direct-to", type=str)
 
@@ -127,40 +127,19 @@ if __name__ == "__main__":
             args=args,
         )
 
-    elif args.mode == "benchmark":
-        print("Preparing Benchmark!")
-        dataset_name = args.benchmark_dataset
-        provider = AdapterProvider(dataset_name=dataset_name)
-        manager.benchmark(
-            provider.get_inputs,
-            provider.compare_outputs,
-            dataset_name=dataset_dict[dataset_name],
-        )
-
     elif args.mode == "inference":
         print("Setting up the inference mode, 'n' for next question")
         manager.load_dataset(dataset_name=dataset_dict["mathvision"], split="test")
-        # manager.load_dataset(dataset_name=dataset_dict["mathvision"], split="testmini")
-        # before = time.time()
         manager.prepare_for_inference()
-        # ex_idx = random.randint(0, len(manager.dataset) - 1)
         ex_idx = 167
         example = manager.dataset[ex_idx]
         image = example["decoded_image"]
         context = context_maker(example)
         print(example["id"])
 
-        # system = {
-        #     "role": "system",
-        #     "content": [
-        #         {"type": "text", "text": context},
-        #         {"type": "image", "image": image},
-        #     ],
-        # }
         system = {"role": "assistant", "content": context}
 
         user = input(f"Type the answer to this question: {example['question']}\n")
-        # user = "I think the answer is A"
         messages = [system]
 
         messages.append({"role": "user", "content": user})

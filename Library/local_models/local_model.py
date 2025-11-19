@@ -43,7 +43,7 @@ class LocalModel(ABC):
 
     def process_dataset(self, dataset_name: str, preprocess: bool, args):
 
-        self.subcategory = "scaffolding"
+        self.subcategory = args.dataset_variation
         if preprocess:
             dataset = load_dataset(dataset_name, split=args.dataset_split)
             with open(f"./Datasets/mathvision_{self.subcategory}.json") as f:
@@ -74,7 +74,7 @@ class LocalModel(ABC):
                 dataset_name + f"_processed_with_{self.base_model}_{self.subcategory}"
             )
 
-    # GPT VIBE
+    # GPT generated print function for layer quantization check
     def print_model_quantization_info(self, model, label="Model"):
         """Prints a structured summary of quantization and dtype per model section."""
         print(f"\n{'='*100}")

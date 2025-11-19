@@ -6,6 +6,8 @@ It includes training scripts, evaluation results, and analyses based on the expe
 
 ---
 
+
+
 ## Contents
 
 - `Datasets/` — Data used for training and evaluation  
@@ -14,10 +16,17 @@ It includes training scripts, evaluation results, and analyses based on the expe
 
 ---
 
+## Environment
+
+To setup the environment 
+```bash
+conda env create -f environment
+```
+
 ## Training
 
 To reproduce training:
 
 ```bash
-conda activate phi_env
-python main.py train --model-name phi --run-name <experiment_name>
+conda activate VLMath_env
+accelerate launch --config_file ./Config/phi_ds_config.yaml main.py train --process-dataset True --model-name phi --run-name <experiment_name>

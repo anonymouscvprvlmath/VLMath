@@ -64,7 +64,6 @@ class Phi(LocalModel):
             self.eos_token
         )
         self.model.config.pad_token_id = self.model.config.eos_token_id
-        pass
 
     def _prepare_for_inference(self):
         if not torch.cuda.is_available():
