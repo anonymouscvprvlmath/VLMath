@@ -20,7 +20,7 @@ It includes training scripts, evaluation results, and analyses based on the expe
 
 To setup the environment 
 ```bash
-conda env create -f environment
+conda env create -f environment.ym
 ```
 
 ## Training
