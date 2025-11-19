@@ -22,9 +22,11 @@ This variant produces concise, inquiry-based dialogues that balance reasoning ac
 
 ## Contents
 
-- `Datasets/` — Data used for training and evaluation  
-- `Library/` — Core scripts for training and evaluation  
-- `results/` — Benchmark results, training logs, and analysis outputs  
+- `Config/` - Accelerate Config used for training
+- `Datasets/` — Data used for training and evaluation
+- `Library/` — Core scripts for training
+- `DatasetGeneration/` - Scripts and prompts used for creating datasets
+- `results/` — Benchmark results and token analysis outputs  
 
 ---
 

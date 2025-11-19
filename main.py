@@ -1,5 +1,5 @@
 from Library.model_manager import ModelManager
-from Library.prompts import context_maker
+
 import argparse
 import numpy as np
 import sys
@@ -21,8 +21,6 @@ Reference Solution (for your understanding, not to copy directly):
 When you respond, reason carefully and clearly.
 Focus on explaining the reasoning steps at the student's level of understanding.
 """
-    # If the question involves visual input, describe and reason about the image explicitly.
-    # End your response with the final numerical or symbolic answer when appropriate.
 )
 
 if __name__ == "__main__":
@@ -41,12 +39,6 @@ if __name__ == "__main__":
         default="mathvision",
         help="Supported datasets are: mathvista",
     )
-    # parser.add_argument(
-    #     "--benchmark-dataset",
-    #     type=str,
-    #     default="mathvista",
-    #     help="Supported datasets are: mathvista, mathdial",
-    # )
     parser.add_argument(
         "--from-finetuned",
         type=str,
